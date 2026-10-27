@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+:root {
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+}
+.dark {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --text: #f1f5f9;
+  --muted: #94a3b8;
+  --border: #334155;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  @apply rounded-xl shadow-sm;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition;
+}
+.btn-primary { @apply btn bg-brand-600 text-white hover:bg-brand-700; }
+.btn-ghost   { @apply btn hover:bg-slate-100 dark:hover:bg-slate-700; }
+
+.input {
+  @apply w-full rounded-lg border px-3 py-2 text-sm outline-none;
+  background: var(--card);
+  border-color: var(--border);
+  color: var(--text);
+}
+.input:focus { @apply ring-2 ring-brand-500; }
