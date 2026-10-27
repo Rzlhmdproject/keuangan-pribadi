@@ -50,7 +50,7 @@ aside h1,.sb{display:none}aside button{white-space:nowrap;padding:9px 11px;font-
 <body>
 <div id="app">
 <aside><h1>Keuangan Pribadi<small>Sistem 2026</small></h1><div id="nav" style="display:contents"></div>
-<div class="sb"><button onclick="csv()">Ekspor CSV</button><button onclick="clearDemo()">Hapus data demo</button></div></aside>
+<div class="sb"><button onclick="csv()">Ekspor CSV</button></div></aside>
 <main><header><input type="month" id="m" aria-label="Periode"><button class="pri" onclick="openForm()">+ Catat transaksi</button></header><div id="v"></div></main>
 </div>
 <dialog id="d"></dialog><div id="toast" role="status"></div>
@@ -61,17 +61,17 @@ const OUT=[["Makan & Minum","Kebutuhan"],["Transportasi & Bensin","Kebutuhan"],[
 const INC=["Gaji Utama","Pemasukan Tambahan","Bonus & Lembur","Investasi & Passive Income","Lain-lain"],METH=["Transfer Bank","QRIS","Tunai","Debit","Kartu Kredit / Paylater"],AL=["Kebutuhan","Keinginan","Tabungan","Kewajiban"];
 const PAGES=[["dash","Dashboard"],["tx","Transaksi"],["bud","Anggaran"],["acc","Rekening"],["goal","Target"],["rep","Laporan"],["debt","Utang"],["set","Pengaturan"]];
 const nid=(t,tx=S.tx)=>{const p={in:"INC",out:"EXP",tf:"TRF"}[t];return p+"-"+String(1+Math.max(0,...tx.filter(x=>x.id.startsWith(p)).map(x=>+x.id.slice(4)))).padStart(3,"0")};
-function seed(){const acc=[["a1","Rekening Utama (BCA)","Bank",5e5],["a2","E-Wallet (Gopay/OVO/Dana)","E-Wallet",1e5],["a3","Dompet Tunai","Kas Tunai",5e4],["a4","Rekening Tabungan","Bank Tabungan",2e6],["a5","Akun Investasi (Bibit)","Investasi",1e6]].map(([id,name,kind,start])=>({id,name,kind,start}));
+function seed(){const acc=[["a1","Rekening Utama (BCA)","Bank",0],["a2","E-Wallet (Gopay/OVO/Dana)","E-Wallet",0],["a3","Dompet Tunai","Kas Tunai",0],["a4","Rekening Tabungan","Bank Tabungan",0],["a5","Akun Investasi (Bibit)","Investasi",0]].map(([id,name,kind,start])=>({id,name,kind,start}));
 const tx=[],add=o=>tx.push({status:"Lunas",...o,id:nid(o.type,tx)});
 add({type:"in",date:"2026-10-01",cat:"Gaji Utama",desc:"Gaji Bulanan Oktober 2026 - PT Utama Mandiri",amt:2.5e6,acc:"a1"});
 add({type:"in",date:"2026-10-15",cat:"Pemasukan Tambahan",desc:"Project Desain Banner",amt:35e4,acc:"a2"});
 add({type:"tf",date:"2026-10-01",cat:"Tabungan Goal",desc:"Setoran wajib tabungan bulanan",amt:5e5,acc:"a1",to:"a4",goal:"g2",alloc:"Tabungan"});
 ["2026-10-01","2026-10-02"].forEach(date=>{[["Transportasi & Bensin","Bensin motor harian",1e4,"a2","QRIS","Kebutuhan"],["Makan & Minum","Sarapan",1e4,"a3","Tunai","Kebutuhan"],["Jajan & Hiburan","Kopi dan camilan",1e4,"a2","QRIS","Keinginan"],["Makan & Minum","Makan malam",15e3,"a3","Tunai","Kebutuhan"]].forEach(([cat,desc,amt,a,method,alloc])=>add({type:"out",date,cat,desc,amt,acc:a,method,alloc}))});
 const base={"Makan & Minum":105e4,"Transportasi & Bensin":3e5,"Jajan & Hiburan":3e5,"Tabungan Goal":5e5,"Tempat Tinggal & Tagihan":2e5,"Kebutuhan Pribadi":15e4},bud={};for(const k in base)bud["base|"+k]=base[k];
-return{tx,acc,bud,debts:[],actual:{},demo:true,target:5e5,warn:.9,goals:[{id:"g1",name:"Dana Darurat (3x Gaji)",target:75e5,start:2e6},{id:"g2",name:"Tabungan HP / Laptop",target:3e6,start:5e5},{id:"g3",name:"Dana Liburan Akhir Tahun",target:2e6,start:3e5},{id:"g4",name:"Investasi Reksadana / Emas",target:1e7,start:1e6}]}}
-function load(){try{const s=JSON.parse(localStorage.getItem("pfms26"));if(s&&s.tx){s.debts=s.debts||[];return s}}catch(e){}return seed()}
-function save(){try{localStorage.setItem("pfms26",JSON.stringify(S))}catch(e){toast("Penyimpanan browser tidak tersedia")}}
-let S=load(),V={p:"dash",m:"2026-10",q:"",ty:""};const d=$("#d");
+tx.length=0;return{tx,acc,bud,debts:[],actual:{},demo:false,target:5e5,warn:.9,goals:[{id:"g1",name:"Dana Darurat (3x Gaji)",target:75e5,start:0},{id:"g2",name:"Tabungan HP / Laptop",target:3e6,start:0},{id:"g3",name:"Dana Liburan Akhir Tahun",target:2e6,start:0},{id:"g4",name:"Investasi Reksadana / Emas",target:1e7,start:0}]}}
+function load(){try{const s=JSON.parse(localStorage.getItem("pfms26c"));if(s&&s.tx){s.debts=s.debts||[];return s}}catch(e){}return seed()}
+function save(){try{localStorage.setItem("pfms26c",JSON.stringify(S))}catch(e){toast("Penyimpanan browser tidak tersedia")}}
+let S=load(),V={p:"dash",m:new Date().toISOString().slice(0,7),q:"",ty:""};const d=$("#d");
 const toast=t=>{const e=$("#toast");e.textContent=t;e.style.opacity=1;clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.opacity=0,2200)};
 const an=id=>(S.acc.find(a=>a.id===id)||{}).name||"-",ak=id=>(S.acc.find(a=>a.id===id)||{}).kind;
 const ym=x=>x.date.slice(0,7),paid=x=>x.type==="tf"||(x.type==="out"&&x.status==="Lunas");
@@ -168,10 +168,10 @@ function delGoal(id){if(confirm("Hapus target ini?")){S.goals=S.goals.filter(g=>
 function addAcc(){const name=prompt("Nama akun (misal ShopeePay):");if(!name)return;const kind=prompt("Jenis akun (Bank, E-Wallet, Kas Tunai, Bank Tabungan, Investasi):","Bank")||"Bank";S.acc.push({id:"a"+Date.now(),name,kind,start:Math.max(0,+prompt("Saldo awal (Rp):","0")||0)});save();render()}
 function setp(){return`<h2>Pengaturan dan cadangan</h2><div class="grid"><div class="box"><h3>Cadangan data</h3><p class="mut">Data tersimpan di browser ini. Unduh cadangan secara berkala, atau pulihkan di perangkat lain.</p><div class="bar"><button class="b" onclick="backup()">Unduh cadangan (.json)</button><label style="flex-direction:row;cursor:pointer;border:1px solid var(--l);border-radius:8px;padding:8px 10px;color:var(--t)">Pulihkan dari file<input type="file" accept=".json" hidden onchange="restore(this.files[0])"></label></div></div>
 <div class="box"><h3>Saldo awal akun</h3><table>${S.acc.map(a=>`<tr><td>${E(a.name)}</td><td class="r"><input type="number" min="0" style="width:130px;text-align:right" value="${a.start}" onchange="S.acc.find(x=>x.id==='${a.id}').start=Math.max(0,+this.value||0);save();render()"></td></tr>`).join("")}</table></div>
-<div class="box"><h3>Mulai dari awal</h3><p class="mut">Menghapus semua data dan kembali ke data demo.</p><button class="b" onclick="resetAll()">Reset semua data</button></div></div>`}
+<div class="box"><h3>Mulai dari awal</h3><p class="mut">Menghapus semua transaksi dan pengaturan, lalu mulai dari awal.</p><button class="b" onclick="resetAll()">Reset semua data</button></div></div>`}
 function backup(){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:"application/json"}));a.download="cadangan-keuangan.json";a.click()}
 function restore(f){if(!f)return;const r=new FileReader();r.onload=()=>{try{const n=JSON.parse(r.result);if(!Array.isArray(n.tx)||!Array.isArray(n.acc)||!Array.isArray(n.goals))throw 0;if(!confirm("Ganti semua data saat ini dengan isi cadangan?"))return;n.debts=n.debts||[];n.bud=n.bud||{};n.actual=n.actual||{};S=n;save();render();toast("Cadangan dipulihkan")}catch(e){toast("File cadangan tidak valid")}};r.readAsText(f)}
-function resetAll(){if(!confirm("Hapus SEMUA data dan kembali ke data demo?"))return;S=seed();save();render();toast("Data direset")}
+function resetAll(){if(!confirm("Hapus SEMUA data dan mulai dari awal?"))return;S=seed();save();render();toast("Data direset")}
 render();
 </script>
 </body>
